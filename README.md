@@ -7,10 +7,12 @@
 In order to use the chatAI project you need an OpenAI token.
 To create such a token go the OpenAI website [here](https://platform.openai.com/overview)
 
-Then create a `.env` file at the root of the repository containing the token:
+Then create a `.env` file at the root of the repository containing the token and the desired
+OpenAI model to use for the chat:
 
-```text
+```bash
 OPENAI_API_KEY=<token>
+OPENAI_MODEL=gpt-3.5-turbo #or gpt-4
 ```
 
 ### Documents

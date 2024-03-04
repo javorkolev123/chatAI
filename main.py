@@ -1,4 +1,5 @@
 import os.path
+import argparse
 
 import dotenv
 import chromadb
@@ -11,6 +12,7 @@ from loader.loader import Loader
 import chromadb.utils.embedding_functions as embedding_functions
 
 OPENAI_KEY = 'OPENAI_API_KEY'
+OPENAI_MODEL = 'OPENAI_MODEL'
 
 TEMPLATE = ("You are an assistant for question-answering tasks."
             "Use the following pieces of retrieved context to answer the question. "
@@ -24,8 +26,12 @@ COLLECTION = "PDFChat"
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        prog='chatAI',
+        description='An indexing program that allows you to chat with your PDF documents')
+    _ = parser.parse_args()
+
     # TODO: Add option to use local models.
-    # TODO: Add option to choose OpenAI model.
     dotenv.load_dotenv()
 
     # Create DB and load data
@@ -49,7 +55,7 @@ def main():
 
     # TODO: Add option to limit search to a certain directory
     retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 6})
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+    llm = ChatOpenAI(model_name=os.environ[OPENAI_MODEL], temperature=0)
     prompt_template = PromptTemplate.from_template(TEMPLATE)
 
     # TODO: Add dialogue memory
