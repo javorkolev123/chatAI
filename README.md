@@ -43,3 +43,12 @@ After you are done with the setup just run the main file.
 You can then update the PDFs, add new ones or delete them from the 
 Documents folder. Every time you rerun the program it will detect
 any changes you have made and update the indexed documents.
+
+You may also specify a particular directory or file you wish to chat
+with. Only the specified file or directory will be used as context in
+that case.
+
+```commandline
+python main.py -f Documents/Test/test.pdf
+python main.py -d Documents/Test
+```

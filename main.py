@@ -28,8 +28,13 @@ COLLECTION = "PDFChat"
 def main():
     parser = argparse.ArgumentParser(
         prog='chatAI',
-        description='An indexing program that allows you to chat with your PDF documents')
-    _ = parser.parse_args()
+        description='An indexing application that allows you to chat with your PDF documents')
+    parser.add_argument("-d", "--directory", help="If populated only the specified directory will be used in the chat "
+                                                  "context. Enter the path relative to the repository root.")
+    parser.add_argument("-f", "--file", help="If populated only the specified file will be used in the chat context. "
+                                             "Enter the path relative to the repository root. Takes precedence over "
+                                             "directory flag")
+    args = parser.parse_args()
 
     # TODO: Add option to use local models.
     dotenv.load_dotenv()
@@ -53,8 +58,21 @@ def main():
         embedding_function=OpenAIEmbeddings(),
     )
 
-    # TODO: Add option to limit search to a certain directory
-    retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 6})
+    if args.file is not None:
+        src = args.file.strip('/')
+        retriever = vectorstore.as_retriever(
+            search_type="similarity",
+            search_kwargs={"k": 6, 'filter': {'source': src}},
+        )
+    elif args.directory is not None:
+        directory = args.directory.strip('/')
+        retriever = vectorstore.as_retriever(
+            search_type="similarity",
+            search_kwargs={"k": 6, 'filter': {'dir': directory}},
+        )
+    else:
+        retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 6})
+
     llm = ChatOpenAI(model_name=os.environ[OPENAI_MODEL], temperature=0)
     prompt_template = PromptTemplate.from_template(TEMPLATE)
 
@@ -76,7 +94,12 @@ def main():
             break
 
         output = rag_chain_with_source.invoke(data)
-        print(f'Sources: {output["context"]}\nQuestion: {output["question"]}\nAnswer: {output["answer"]}')
+        documents = output["context"]
+        print('Sources are:')
+        for d in documents:
+            page_content = d.page_content.replace("\\n","\n")
+            print(f'Metadata: {d.metadata}\n{page_content}\n')
+        print(f'Question: {output["question"]}\nAnswer: {output["answer"]}')
 
 
 def format_docs(docs):
