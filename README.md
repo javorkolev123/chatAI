@@ -48,6 +48,8 @@ You may also specify a particular directory or file you wish to chat
 with. Only the specified file or directory will be used as context in
 that case.
 
+NOTE: The required Pyhon version is 3.11.7
+
 ```commandline
 python main.py -f Documents/Test/test.pdf
 python main.py -d Documents/Test
